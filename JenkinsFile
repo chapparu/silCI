@@ -1,0 +1,135 @@
+pipeline {
+    agent any
+
+    // Define environment variables used in different stages
+    environment {
+        DEV_ENV = 'dev-server.example.com'
+        TEST_ENV = 'test-server.example.com'
+        PROD_ENV = 'prod-server.example.com'
+        APP_NAME = 'my-sample-app'
+        DOCKER_IMAGE = 'my-docker-repo/my-sample-app:latest'
+    }
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: 'develop', description: 'Branch to build')
+        string(name: 'BUILD_VERSION', defaultValue: '1.0', description: 'Build version')
+        booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Run unit tests after build')
+        string(name: 'PARAM1', defaultValue: 'default value1', description: 'test param1')
+        string(name: 'PARAM2', defaultValue: 'default value2', description: 'test param2')
+        string(name: 'PARAM3', defaultValue: 'default value1', description: 'test param3')
+        string(name: 'PARAM4', defaultValue: 'default value2', description: 'test param4')
+        string(name: 'PARAM5', defaultValue: 'default value1', description: 'test param5')
+        string(name: 'PARAM6', defaultValue: 'default value2', description: 'test param6')
+    }
+
+    stages {
+        // Stage 1: Checkout code from version control
+        stage('Checkout') {
+            steps {
+                script {
+                    echo 'Checking out code from Git...'
+                    // checkout scm
+                    sleep time: 2, unit: 'SECONDS'
+                }
+            }
+        }
+
+        // Stage 2: Build the application
+        stage('Build') {
+            steps {
+                script {
+                    echo 'Building application...'
+                    echo "BRANCH_NAME: ${params.BRANCH_NAME}"
+                    echo "BUILD_VERSION: ${params.BUILD_VERSION}"
+                    echo "RUN_TESTS: ${params.RUN_TESTS}"
+                    echo "PARAM1: ${params.PARAM1}"
+                    echo "PARAM2: ${params.PARAM2}"
+                    echo "PARAM3: ${params.PARAM3}"
+                    echo "PARAM4: ${params.PARAM4}"
+                    echo "PARAM5: ${params.PARAM5}"
+                    echo "PARAM6: ${params.PARAM6}"
+                    // Example of building using Docker
+                    // sh '''
+                    //     docker build -t $DOCKER_IMAGE .
+                    // '''
+                    sleep time: 2, unit: 'SECONDS'
+                }
+            }
+        }
+
+        // Stage 3: Run unit tests
+        stage('Unit Tests') {
+            steps {
+                script {
+                    echo 'Running unit tests...'
+                    // Example for running tests
+                    // sh '''
+                    //     docker run $DOCKER_IMAGE ./run_tests.sh
+                    // '''
+                    sleep time: 2, unit: 'SECONDS'
+                }
+            }
+        }
+
+        // Stage 4: Deploy to development environment
+        stage('Deploy to Development') {
+            // when {
+            //     branch 'develop'
+            // }
+            steps {
+                script {
+                    echo 'Deploying to Development Environment...'
+                    // sh '''
+                    //     ssh user@$DEV_ENV 'docker pull $DOCKER_IMAGE && docker run -d $DOCKER_IMAGE'
+                    // '''
+                    sleep time: 2, unit: 'SECONDS'
+                }
+            }
+        }
+
+        // Stage 5: Deploy to testing environment
+        stage('Deploy to Testing') {
+            // when {
+            //     branch 'develop'
+            // }
+            steps {
+                script {
+                    echo 'Deploying to Testing Environment...'
+                    // sh '''
+                    //     ssh user@$TEST_ENV 'docker pull $DOCKER_IMAGE && docker run -d $DOCKER_IMAGE'
+                    // '''
+                    sleep time: 2, unit: 'SECONDS'
+                }
+            }
+        }
+
+        // Stage 7: Deploy to production environment
+        stage('Deploy to Production') {
+            // when {
+            //     branch 'main'
+            // }
+            steps {
+                script {
+                    echo 'Deploying to Production Environment...'
+                    // sh '''
+                    //     ssh user@$PROD_ENV 'docker pull $DOCKER_IMAGE && docker run -d $DOCKER_IMAGE'
+                    // '''
+                    sleep time: 2, unit: 'SECONDS'
+                }
+            }
+        }
+    }
+
+    // Define post steps for clean-up or reporting
+    post {
+        always {
+            echo 'Cleaning up resources...'
+            sleep time: 2, unit: 'SECONDS'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
